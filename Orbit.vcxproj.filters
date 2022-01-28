@@ -13,6 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Bin">
+      <UniqueIdentifier>{25764abe-efe3-46c4-b3d3-e6572fa19e90}</UniqueIdentifier>
+      <Extensions>exe</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Orbit.h">
@@ -65,6 +69,9 @@
   <ItemGroup>
     <None Include="res\Orbit.rc2">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Bin\Orbit.exe">
+      <Filter>Bin</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

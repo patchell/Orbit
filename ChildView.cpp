@@ -109,7 +109,7 @@ vector CChildView::DeltaX(
 {
 	//-------------------------------------
 	// DeltaX
-	// Calculates the delta x gor a given boddy
+	// Calculates the delta x for a given boddy
 	// Parameters
 	//	mAtrctedPos...Position of attracted body
 	//	mAtrctingPos..Position of attracting body
@@ -200,6 +200,10 @@ CBody* CChildView::GetOtherBodies(CBody* pNotThisOne, CBody* pLastOne)
 
 void CChildView::OnIntialUpdate()
 {
+	//--------------------------------
+	// This function does all of the
+	// initial setup
+	//--------------------------------
 	CBody* pBody;
 
 	pBody = new CBody();
