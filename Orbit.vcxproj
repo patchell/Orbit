@@ -209,7 +209,9 @@
     <ResourceCompile Include="Orbit.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Bin\Orbit.exe" />
+    <None Include="Bin\Orbit.exe">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="res\Orbit.rc2" />
   </ItemGroup>
   <ItemGroup>
