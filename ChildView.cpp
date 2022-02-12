@@ -86,6 +86,7 @@ void CChildView::OnPaint()
 			10,
 			pBod->GetColor()
 		);
+		pBod->DrawBreadCrumbs(&DCm);
 		pBod = pBod->GetNext();
 	}
 	
@@ -148,7 +149,7 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 	if (m_Run)
 	{
 		pBodAttracted = GETBODIES;
-		printf("tick %d\n", ++TimeCount);
+//		printf("tick %d\n", ++TimeCount);
 		while (pBodAttracted)
 		{
 			dx.Clear();
@@ -163,7 +164,9 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 				pBodAttracting = GetOtherBodies(pBodAttracted, pBodAttracting);
 			}
 			vector newPos;
-			newPos = pBodAttracted->GetPosition() + dx + pBodAttracted->GetVelocity();
+			vector oldPos = pBodAttracted->GetPosition();
+			pBodAttracted->AddBreadCrum(oldPos.ToPoint());
+			newPos = oldPos + dx + pBodAttracted->GetVelocity();
 			pBodAttracted->SetTemps(newPos, pBodAttracted->GetVelocity() + dx);
 			//		printf("New Pos:(%d,%d) dX=(%lf,%lf)\n", int(newPos.m_x),int( newPos.m_y),dx.m_x,dx.m_y);
 			pBodAttracted = pBodAttracted = pBodAttracted->GetNext();

@@ -195,3 +195,39 @@ void COrbitApp::OnSetupCreatebody()
 	dlg.DoModal();
 	pView->Invalidate();
 }
+
+void CBody::AddBreadCrum(CPoint p)
+{
+	if (m_numberOfBreadCrumbs < NUMBER_OF_BREADCRUMBS)
+	{
+		m_BreadCrumbs[m_LastBreadCrumb] = p;
+		if (++m_LastBreadCrumb == NUMBER_OF_BREADCRUMBS) m_LastBreadCrumb = 0;
+		m_numberOfBreadCrumbs++;
+	}
+	else if (m_numberOfBreadCrumbs == NUMBER_OF_BREADCRUMBS)
+	{
+		if (NUMBER_OF_BREADCRUMBS == ++m_LastBreadCrumb)
+		{
+			m_LastBreadCrumb = 0;
+		}
+		if (NUMBER_OF_BREADCRUMBS == ++m_FirstBreadCrumb)
+		{
+			m_FirstBreadCrumb = 0;
+		}
+
+		m_BreadCrumbs[m_LastBreadCrumb] = p;
+	}
+}
+
+void CBody::DrawBreadCrumbs(CDC* pDC)
+{
+	int i,j;
+
+	j = m_FirstBreadCrumb;
+//	printf("Total Breadcrumbs %d  Index %d\n", m_numberOfBreadCrumbs,j);
+	for (i = 0; i < m_numberOfBreadCrumbs; ++i)
+	{
+		pDC->SetPixel(m_BreadCrumbs[j++], m_Color);
+		if (j == NUMBER_OF_BREADCRUMBS)j = 0;
+	}
+}

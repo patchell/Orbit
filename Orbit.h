@@ -42,7 +42,6 @@ struct vector {
 		v.m_y = m_y + r.m_y;
 		return v;
 	}
-
 	vector operator * (double s)
 	{
 		vector r;
@@ -68,8 +67,12 @@ struct vector {
 		m_x = 0.0;
 		m_y = 0.0;
 	}
+	CPoint ToPoint() {
+		return CPoint(int(m_x), int(m_y));
+	}
 };
 
+#define NUMBER_OF_BREADCRUMBS	2000
 class CBody
 {
 	CBody* m_pNext;
@@ -78,7 +81,14 @@ class CBody
 	vector m_vPos_Temp;
 	vector m_vVelocity_Temp;
 	COLORREF m_Color;
-
+	//--------------------------
+	CPoint m_BreadCrumbs[NUMBER_OF_BREADCRUMBS];
+	int m_FirstBreadCrumb;
+	int m_LastBreadCrumb;
+	int m_numberOfBreadCrumbs;
+	COLORREF m_BreadCrumbColor;
+	//----------------------------
+	int m_Radius;
 	double m_dMass;
 public:
 	CBody() {
@@ -87,6 +97,12 @@ public:
 		m_pNext = 0;
 		m_dMass = 1.0;
 		m_Color = RGB(255, 255, 0);
+		m_numberOfBreadCrumbs = 0;
+		m_FirstBreadCrumb = 0;
+		m_LastBreadCrumb = 0;
+		m_BreadCrumbColor = RGB(255, 0, 0);
+		m_Radius = 5;
+
 	}
 	virtual ~CBody() {}
 	void SetVelociry(vector v)
@@ -113,6 +129,13 @@ public:
 	}
 	void SetColor(COLORREF c) { m_Color = c; }
 	COLORREF GetColor() { return m_Color; }
+	void SetRadius(int r) { m_Radius = r; }
+	int GetRadius() { return m_Radius; }
+	//--------------------------------------
+	// Bread Crumbs
+	//--------------------------------------
+	void AddBreadCrum(CPoint p);
+	void DrawBreadCrumbs(CDC* pDC);
 };
 
 
