@@ -14,33 +14,26 @@ class CChildView : public CWnd
 	int m_Run;
 public:
 	CChildView();
-
-// Attributes
-public:
-
-// Operations
-	vector DeltaX(vector m1Pos, vector m2Pos, double m2);
-public:
-
-// Overrides
-protected:
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-
-// Implementation
-public:
 	virtual ~CChildView();
-
-	// Generated message map functions
-protected:
-	afx_msg void OnPaint();
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	CBody* GetOtherBodies(CBody* pNotThisOne, CBody* pLastOne);
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	void OnIntialUpdate();
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	//----------------------------
+	// Orbit Stuff
+	//----------------------------
+	void SetDefaultBodyOrbits();
+	CVector DeltaX(CVector m1Pos, CVector m2Pos, double m2);
+	CBody* GetOtherBodies(CBody* pNotThisOne, CBody* pLastOne);
 	void DrawCircleAt(CDC* pDC, CPoint ptCenter, int Radius, COLORREF color);
+	CVector CenterOfMass(CBody* pBodies);
+	//----------------------------
+	// Message Handlers
+	//----------------------------
+	afx_msg void OnPaint();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnFileStart();
 	afx_msg void OnFilePause();
+protected:
+	DECLARE_MESSAGE_MAP()
 };
 

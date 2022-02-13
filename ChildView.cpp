@@ -3,9 +3,6 @@
 //
 
 #include "pch.h"
-#include "framework.h"
-#include "Orbit.h"
-#include "ChildView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -60,6 +57,7 @@ void CChildView::OnPaint()
 	CBrush brGreen;
 	CBrush brBlue;
 	CPen penBlack, *oldPen;
+	CString csPE;
 
 	brGreen.CreateSolidBrush(RGB(0, 255, 0));
 	brBlue.CreateSolidBrush(RGB(0, 0, 255));
@@ -81,12 +79,20 @@ void CChildView::OnPaint()
 		x = (int)pBod->GetPosition().m_x;
 		y = (int)pBod->GetPosition().m_y;
 		DrawCircleAt(
-			&DCm, 
-			CPoint(x,y),
+			&DCm,
+			CPoint(x, y),
 			10,
 			pBod->GetColor()
 		);
 		pBod->DrawBreadCrumbs(&DCm);
+		DrawCircleAt(
+			&DCm,
+			CenterOfMass(GETBODIES).ToPoint(),
+			5,
+			RGB(255, 0, 0)
+		);
+//		csPE.Format(_T("PE=%8.4lf"), );
+//		DCm.TextOutW(0, 0, 
 		pBod = pBod->GetNext();
 	}
 	
@@ -102,9 +108,26 @@ void CChildView::OnPaint()
 	);
 }
 
-vector CChildView::DeltaX(
-	vector AtrctedPos,	//Attracted body 
-	vector AtrctingPos,	//Attractomg body
+void CChildView::SetDefaultBodyOrbits()
+{
+	CBody* pBody;
+
+	pBody = new CBody();
+	pBody->SetMass(300.0);
+	pBody->SetPosition(CVector(500.0, 300.0));
+	pBody->SetVelociry(CVector(0.0, 0.8));
+	ADDBODY(pBody);
+	pBody = new CBody();
+	pBody->SetMass(500.0);
+	pBody->SetPosition(CVector(800.0, 300.0));
+	pBody->SetVelociry(CVector(0.0, -0.4750));
+	pBody->SetColor(RGB(0, 0, 255));
+	ADDBODY(pBody);
+}
+
+CVector CChildView::DeltaX(
+	CVector AtrctedPos,	//Attracted body 
+	CVector AtrctingPos,	//Attractomg body
 	double mass		//Attracting max
 )
 {
@@ -119,11 +142,11 @@ vector CChildView::DeltaX(
 	// returns the change in position/velocity
 	//		of the Observed body
 	//---------------------------------------
-	vector deltaX = vector(0.0, 0.0);
+	CVector deltaX = CVector(0.0, 0.0);
 	//------------------------------
-	// Calculate distance vector
+	// Calculate distance CVector
 	//------------------------------
-	vector r21;
+	CVector r21;
 	r21 = AtrctingPos - AtrctedPos;
 	//-----------------------------
 	// Cube magnitude of r12
@@ -145,7 +168,7 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 	CBody* pBodAttracted = 0;
 	CBody* pBodAttracting = 0;
 
-	vector dx;
+	CVector dx;
 	if (m_Run)
 	{
 		pBodAttracted = GETBODIES;
@@ -163,8 +186,8 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 				) + dx;
 				pBodAttracting = GetOtherBodies(pBodAttracted, pBodAttracting);
 			}
-			vector newPos;
-			vector oldPos = pBodAttracted->GetPosition();
+			CVector newPos;
+			CVector oldPos = pBodAttracted->GetPosition();
 			pBodAttracted->AddBreadCrum(oldPos.ToPoint());
 			newPos = oldPos + dx + pBodAttracted->GetVelocity();
 			pBodAttracted->SetTemps(newPos, pBodAttracted->GetVelocity() + dx);
@@ -207,19 +230,7 @@ void CChildView::OnIntialUpdate()
 	// This function does all of the
 	// initial setup
 	//--------------------------------
-	CBody* pBody;
-
-	pBody = new CBody();
-	pBody->SetMass(300.0);
-	pBody->SetPosition(vector(500.0, 300.0));
-	pBody->SetVelociry(vector(0.0, 0.8));
-	ADDBODY(pBody);
-	pBody = new CBody();
-	pBody->SetMass(500.0);
-	pBody->SetPosition(vector(800.0, 300.0));
-	pBody->SetVelociry(vector(0.0, -0.50));
-	pBody->SetColor(RGB(0, 0, 255));
-	ADDBODY(pBody);
+	SetDefaultBodyOrbits();
 	m_TimerID = SetTimer(1000, 10, 0);
 	theApp.SetView(this);
 }
@@ -243,6 +254,23 @@ void CChildView::DrawCircleAt(CDC *pDC,CPoint ptCenter, int Radius, COLORREF col
 	pDC->Ellipse(&rect);
 	pDC->SelectObject(oldPen);
 	pDC->SelectObject(pOldBrush);
+}
+
+CVector CChildView::CenterOfMass(CBody* pBodies)
+{
+	CVector CentOfMass;
+	double My = 0.0, Mx = 0.0;
+	double TotalMass = 0.0;
+	CBody* pCB = pBodies;
+	while (pCB)
+	{
+		Mx += pCB->GetMass() * pCB->GetPosition().m_y;
+		My += pCB->GetMass() * pCB->GetPosition().m_x;
+		TotalMass += pCB->GetMass();
+		pCB = pCB->GetNext();
+	}
+	CentOfMass = CVector(My/TotalMass, Mx/TotalMass);
+	return CentOfMass;
 }
 
 void CChildView::OnFileStart()

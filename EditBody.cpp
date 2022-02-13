@@ -2,9 +2,6 @@
 //
 
 #include "pch.h"
-#include "Orbit.h"
-#include "EditBody.h"
-#include "afxdialogex.h"
 
 
 // CEditBody dialog
@@ -90,8 +87,8 @@ void CEditBody::CreateDefault()
 	CBody* pBody;
 	pBody = new CBody();
 	pBody->SetMass(300.0);
-	pBody->SetPosition(vector(500.0, 300.0));
-	pBody->SetVelociry(vector(0.0, 0.8));
+	pBody->SetPosition(CVector(500.0, 300.0));
+	pBody->SetVelociry(CVector(0.0, 0.8));
 	ADDBODY(pBody);
 }
 
@@ -107,14 +104,20 @@ void CEditBody::FillInFields()
 	//-----------------------------
 	csText.Format(_T("%lf"), m_pBody->GetMass());
 	m_Edit_Mass.SetWindowTextW(csText);
+	//-------------------------------------
+	// Velocity
+	//-------------------------------------
 	x = m_pBody->GetVelocity().m_x;
 	y = m_pBody->GetVelocity().m_y;
 	angle = atan2(y, x);
 	angle = 360 * angle / m_2Pi;
 	csText.Format(_T("%lf"), angle);
 	m_Edit_VelAngle.SetWindowTextW(csText);
-	csText.Format(_T("%lf"), m_pBody->GetVelocity().Mag() * m_pBody->GetVelocity().Mag());
+	csText.Format(_T("%lf"), m_pBody->GetVelocity().Mag());
 	m_Edit_VelMag.SetWindowTextW(csText);
+	//-----------------------------------------
+	// Position
+	//----------------------------------------
 	csText.Format(_T("%lf"), m_pBody->GetPosition().m_x);
 	m_Edit_Pos_X.SetWindowTextW(csText);
 	csText.Format(_T("%lf"), m_pBody->GetPosition().m_y);
@@ -126,13 +129,22 @@ void CEditBody::UpdateBody()
 	CString csText;
 	double x, y, angle, mag;
 
+	//------------------------------------------
+	// Mass
+	//------------------------------------------
 	m_Edit_Mass.GetWindowTextW(csText);
 	m_pBody->SetMass(_wtof(csText));
+	//------------------------------------------
+	// Position
+	//------------------------------------------
 	m_Edit_Pos_X.GetWindowTextW(csText);
 	x = _wtof(csText);
 	m_Edit_Pos_Y.GetWindowTextW(csText);
 	y = _wtof(csText);
-	m_pBody->SetPosition(vector(x, y));
+	m_pBody->SetPosition(CVector(x, y));
+	//------------------------------------------
+	//  Velocity
+	//------------------------------------------
 	m_Edit_VelMag.GetWindowTextW(csText);
 	mag = _wtof(csText);
 	m_Edit_VelAngle.GetWindowTextW(csText);
@@ -140,5 +152,6 @@ void CEditBody::UpdateBody()
 	angle = m_2Pi * angle / 360.0;
 	x = mag * cos(angle);
 	y = mag * sin(angle);
-	m_pBody->SetVelociry(vector(x,y));
+	m_pBody->SetVelociry(CVector(x,y));
+	m_pBody->Print();
 }

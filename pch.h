@@ -9,5 +9,16 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
+#include "afxwinappex.h"
+#include "afxdialogex.h"
+
+#include "Vector.h"
+#include "Body.h"
+
+#include "MainFrm.h"
+#include "Orbit.h"
+#include "EditBody.h"
+#include "ChildView.h"
+
 
 #endif //PCH_H
