@@ -11,10 +11,12 @@
 #include "framework.h"
 #include "afxwinappex.h"
 #include "afxdialogex.h"
+#include "afxdlgs.h"
 
 #include "Vector.h"
 #include "Body.h"
 
+#include "StaticBitmap.h"
 #include "MainFrm.h"
 #include "Orbit.h"
 #include "EditBody.h"

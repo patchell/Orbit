@@ -1,5 +1,6 @@
 #include "pch.h"
 
+int CBody::IdCount = 0;
 
 void CBody::AddBreadCrum(CPoint p)
 {

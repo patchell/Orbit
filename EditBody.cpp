@@ -12,6 +12,7 @@ CEditBody::CEditBody(CWnd* pParent /*=nullptr*/)
 	: CDialog(IDD_DIALOG_ADD_BODOES, pParent)
 {
 	m_pBody = 0;
+	m_pHead = 0;
 	m_2Pi = atan(1) * 8;
 }
 
@@ -28,12 +29,15 @@ void CEditBody::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_VELOCITY_ANGLE, m_Edit_VelAngle);
 	DDX_Control(pDX, IDC_EDIT_POSITION_X, m_Edit_Pos_X);
 	DDX_Control(pDX, IDC_EDIT_POSITION_Y, m_Edit_Pos_Y);
+	DDX_Control(pDX, IDC_STATIC_BODY_ID, m_Static_BodyId);
 }
 
 
 BEGIN_MESSAGE_MAP(CEditBody, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_NEXTBODY, &CEditBody::OnClickedButtonNextbody)
 	ON_BN_CLICKED(IDOK, &CEditBody::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_BUTTON_ADD_NEW__BODY, &CEditBody::OnClickedButtonAddNewBody)
+	ON_STN_CLICKED(IDC_STATIC_BODYCOLOR, &CEditBody::OnClickedStaticBodycolor)
 END_MESSAGE_MAP()
 
 
@@ -42,16 +46,16 @@ END_MESSAGE_MAP()
 
 void CEditBody::OnClickedButtonNextbody()
 {
+	printf("Next Body\n");
 	UpdateBody();
-	if (m_pBody->GetNext())
+	m_pBody = m_pBody->GetNext();
+	if (m_pBody)
 	{
-		m_pBody = m_pBody->GetNext();
 		FillInFields();
 	}
 	else
 	{
-		CreateDefault();
-		m_pBody = m_pBody->GetNext();
+		m_pBody = m_pHead;
 		FillInFields();
 	}
 }
@@ -69,27 +73,27 @@ BOOL CEditBody::OnInitDialog()
 
 	CDialog::OnInitDialog();
 
-	m_pBody = GETBODIES;
 	if (m_pBody)	//edit exi8sting bodies
 	{
 		FillInFields();
 	}
 	else         //Create a new body
 	{
-		CreateDefault();
+		m_pBody = CreateDefault();
+		ADDBODY(m_pBody);
 	}
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CEditBody::CreateDefault()
+CBody* CEditBody::CreateDefault()
 {
 	CBody* pBody;
 	pBody = new CBody();
 	pBody->SetMass(300.0);
 	pBody->SetPosition(CVector(500.0, 300.0));
 	pBody->SetVelociry(CVector(0.0, 0.8));
-	ADDBODY(pBody);
+	return pBody;
 }
 
 void CEditBody::FillInFields()
@@ -122,6 +126,15 @@ void CEditBody::FillInFields()
 	m_Edit_Pos_X.SetWindowTextW(csText);
 	csText.Format(_T("%lf"), m_pBody->GetPosition().m_y);
 	m_Edit_Pos_Y.SetWindowTextW(csText);
+	//--------------------------------------
+	// Body Color
+	//-------------------------------------
+	m_Static_Color.SetColor(m_pBody->GetColor());
+	//-------------------------------------
+	// Body ID
+	//-------------------------------------
+	csText.Format(_T("Body-%d"), m_pBody->GetID());
+	m_Static_BodyId.SetWindowTextW(csText);
 }
 
 void CEditBody::UpdateBody()
@@ -154,4 +167,27 @@ void CEditBody::UpdateBody()
 	y = mag * sin(angle);
 	m_pBody->SetVelociry(CVector(x,y));
 	m_pBody->Print();
+}
+
+void CEditBody::OnClickedButtonAddNewBody()
+{
+	CBody* pBody;
+
+	pBody = CreateDefault();
+	ADDBODY(pBody);
+	m_pBody = m_pBody->GetNext();
+	FillInFields();
+}
+
+void CEditBody::OnClickedStaticBodycolor()
+{
+	CColorDialog Dlg(m_pBody->GetColor(),CC_FULLOPEN,this);
+	int ID;
+
+	ID = Dlg.DoModal();
+	if (IDOK == ID)
+	{
+		m_pBody->SetColor(Dlg.GetColor());
+		m_Static_Color.SetColor(Dlg.GetColor());
+	}
 }

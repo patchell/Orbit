@@ -25,6 +25,7 @@ COrbitApp::COrbitApp() noexcept
 	m_pHead = 0;
 	m_ppEnd = 0;
 	pConsol = 0;
+	pView = 0;
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
 #ifdef _MANAGED
@@ -187,6 +188,7 @@ void COrbitApp::OnSetupCreatebody()
 {
 	CEditBody dlg;
 
+	dlg.SetBody(GetBody());
 	dlg.DoModal();
 	pView->Invalidate();
 }

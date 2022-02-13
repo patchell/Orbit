@@ -6,22 +6,28 @@
 class CBody
 {
 	CBody* m_pNext;
+	static int IdCount;
+	//-------------------------
+	// Body Attributes
+	//-------------------------
+	int m_BodyID;
 	CVector m_vPos;
 	CVector m_vVelocity;
 	CVector m_vPos_Temp;
 	CVector m_vVelocity_Temp;
 	COLORREF m_Color;
+	int m_Radius;
+	double m_dMass;
+	double m_PotentialEnergy;
+	double m_KineticEnergy;
+	//--------------------------
+	// Bread Crumbs
 	//--------------------------
 	CPoint m_BreadCrumbs[NUMBER_OF_BREADCRUMBS];
 	int m_FirstBreadCrumb;
 	int m_LastBreadCrumb;
 	int m_numberOfBreadCrumbs;
-	COLORREF m_BreadCrumbColor;
 	//----------------------------
-	int m_Radius;
-	double m_dMass;
-	double m_PotentialEnergy;
-	double m_KineticEnergy;
 public:
 	CBody() {
 		m_vPos = CVector(0.0, 0.0);
@@ -32,8 +38,8 @@ public:
 		m_numberOfBreadCrumbs = 0;
 		m_FirstBreadCrumb = 0;
 		m_LastBreadCrumb = 0;
-		m_BreadCrumbColor = RGB(255, 0, 0);
 		m_Radius = 5;
+		m_BodyID = ++IdCount;
 
 	}
 	virtual ~CBody() {}
@@ -63,6 +69,7 @@ public:
 	COLORREF GetColor() { return m_Color; }
 	void SetRadius(int r) { m_Radius = r; }
 	int GetRadius() { return m_Radius; }
+	int GetID() { return m_BodyID; }
 	//--------------------------------------
 	// Bread Crumbs
 	//--------------------------------------
