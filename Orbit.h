@@ -28,7 +28,6 @@ public:
 	virtual int ExitInstance();
 	afx_msg void OnAppAbout();
 	void SetView(CChildView* pV) { pView = pV; }
-
 	void AddBody(CBody* pBod);
 	CBody* GetBody() { return m_pHead; }
 protected:

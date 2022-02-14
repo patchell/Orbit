@@ -17,6 +17,10 @@
       <UniqueIdentifier>{25764abe-efe3-46c4-b3d3-e6572fa19e90}</UniqueIdentifier>
       <Extensions>exe</Extensions>
     </Filter>
+    <Filter Include="ReadMe">
+      <UniqueIdentifier>{17e265d9-457d-475b-8eeb-986c28ec6040}</UniqueIdentifier>
+      <Extensions>md;</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Orbit.h">
@@ -90,6 +94,9 @@
     </None>
     <None Include="Bin\Orbit.exe">
       <Filter>Bin</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>ReadMe</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

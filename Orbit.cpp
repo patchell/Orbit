@@ -104,9 +104,9 @@ BOOL COrbitApp::InitInstance()
 	// Open up a "DOS" window to print debug
 	// Information to.
 	//---------------------------------------
-	AllocConsole();
-	freopen_s(&pConsol, "CONOUT$", "w", stdout);
-	printf("Ready\n");
+//	AllocConsole();
+//	freopen_s(&pConsol, "CONOUT$", "w", stdout);
+//	printf("Ready\n");
 
 	// The one and only window has been initialized, so show and update it
 	pFrame->ShowWindow(SW_SHOW);
@@ -116,7 +116,8 @@ BOOL COrbitApp::InitInstance()
 
 int COrbitApp::ExitInstance()
 {
-	//TODO: handle additional resources you may have added
+//	fclose(pConsol);
+//	FreeConsole();
 	AfxOleTerm(FALSE);
 
 	return CWinApp::ExitInstance();

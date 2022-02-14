@@ -46,7 +46,7 @@ END_MESSAGE_MAP()
 
 void CEditBody::OnClickedButtonNextbody()
 {
-	printf("Next Body\n");
+//	printf("Next Body\n");
 	UpdateBody();
 	m_pBody = m_pBody->GetNext();
 	if (m_pBody)
