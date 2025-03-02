@@ -10,7 +10,22 @@ CVector CVector::CRossProduct(CVector Vect)
     return Result;
 }
 
-void CVector::Print(const char *s)
+double CVector::Distance(CVector Other) 
 {
-//    printf("%s:X=%lf  Y=%lf  Z=%lf\n", s, m_x, m_y, m_z);
+	return sqrt(DistanceSQ(Other));;
+}
+
+double CVector::DistanceSQ(CVector Other) 
+{
+	double Distance = 0;
+
+	Distance += (m_x - Other.m_x) * (m_x - Other.m_x);
+	Distance += (m_y - Other.m_y) * (m_y - Other.m_y);
+	Distance += (m_z - Other.m_z) * (m_z - Other.m_z);
+	return Distance;
+}
+
+void CVector::Print(const char *s) 
+{
+    printf("%s:X=%lf  Y=%lf  Z=%lf\n", s, m_x, m_y, m_z);
 }

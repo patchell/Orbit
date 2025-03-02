@@ -15,44 +15,38 @@ struct CVector {
 		m_z = z;
 	}
 
-	CVector operator - () {
-		CVector r;
-		r.m_x = -m_x;
-		r.m_y = -m_y;
-		r.m_z = -m_z;
-		return r;
-	}
-	CVector operator - (CVector& r) {
-		CVector v;
+	CVector operator - (CVector r) {
 
-		r = -r;
-		v = *this + r;
-		return v;
-	}
-	CVector operator + (CVector& r) {
-		CVector v;
+		CVector Result;
 
-		v.m_x = m_x + r.m_x;
-		v.m_y = m_y + r.m_y;
-		v.m_z = m_z + r.m_z;
-		return v;
+		Result.m_x = m_x - r.m_x;
+		Result.m_y = m_y - r.m_y;
+		Result.m_z = m_z - r.m_z;
+		return Result;
+	}
+	CVector operator + (CVector r) {
+		CVector Result;
+
+		Result.m_x = m_x + r.m_x;
+		Result.m_y = m_y + r.m_y;
+		Result.m_z = m_z + r.m_z;
+		return Result;
 	}
 	CVector operator * (double s)
 	{
-		CVector r;
+		CVector Result;
 
-		r.m_x = s * m_x;
-		r.m_y = s * m_y;
-		r.m_z = s * m_z;
-		return r;
+		Result.m_x = m_x * s;
+		Result.m_y = m_y * s;
+		Result.m_z = m_z * s;
+		return Result;
 	}
 
-	CVector operator = (CVector& r) {
-		CVector x;
-		m_x = x.m_x = r.m_x;
-		m_y = x.m_y = r.m_y;
-		m_z = x.m_z = r.m_z;
-		return x;
+	CVector operator = (CVector r) {
+		m_x = r.m_x;
+		m_y = r.m_y;
+		m_z = r.m_z;
+		return *this;
 	}
 
 	double Mag() {
@@ -65,11 +59,13 @@ struct CVector {
 		m_y = 0.0;
 		m_z = 0.0;
 	}
-	CPoint ToPoint() {
-		return CPoint(int(m_x), int(m_y));
+	CPoint ToPoint(double Scale) {
+		return CPoint(int(m_x / Scale), int(m_y/ Scale));
 	}
 	CVector CRossProduct(CVector Vect);
-	void Print(const char* s);
+	double Distance(CVector Other) ;
+	double DistanceSQ(CVector Other) ;
+	void Print(const char* s)  ;
 };
 
 

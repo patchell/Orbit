@@ -22,8 +22,9 @@ END_MESSAGE_MAP()
 
 COrbitApp::COrbitApp() noexcept
 {
+	m_pLog = 0;
 	m_pHead = 0;
-	m_ppEnd = 0;
+	m_pTail = 0;
 	pConsol = 0;
 	pView = 0;
 	// support Restart Manager
@@ -86,7 +87,7 @@ BOOL COrbitApp::InitInstance()
 	// Change the registry key under which our settings are stored
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
-	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+//	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
 
 	// To create the main window, this code creates a new frame window
@@ -104,10 +105,14 @@ BOOL COrbitApp::InitInstance()
 	// Open up a "DOS" window to print debug
 	// Information to.
 	//---------------------------------------
-//	AllocConsole();
-//	freopen_s(&pConsol, "CONOUT$", "w", stdout);
-//	printf("Ready\n");
+	AllocConsole();
+	freopen_s(&pConsol, "CONOUT$", "w", stdout);
+	printf("Ready\n");
 
+	//-------------------------------------------
+	// Create a Log File
+	//-------------------------------------------
+	fopen_s(&m_pLog, "Log.txt", "w");
 	// The one and only window has been initialized, so show and update it
 	pFrame->ShowWindow(SW_SHOW);
 	pFrame->UpdateWindow();
@@ -117,7 +122,9 @@ BOOL COrbitApp::InitInstance()
 int COrbitApp::ExitInstance()
 {
 //	fclose(pConsol);
-//	FreeConsole();
+	fclose(m_pLog);
+	FreeConsole();
+	DeleteBodies();
 	AfxOleTerm(FALSE);
 
 	return CWinApp::ExitInstance();
@@ -125,16 +132,32 @@ int COrbitApp::ExitInstance()
 
 void COrbitApp::AddBody(CBody* pBod)
 {
-	if (m_pHead == 0)
+	if (m_pHead)
 	{
-		m_pHead = pBod;
-		m_ppEnd = pBod->GetNextPointer();
+		GetTail()->SetNext(pBod);
+		pBod->SetPrev(GetTail());
+		SetTail(pBod);
 	}
 	else
 	{
-		*m_ppEnd = pBod;
-		m_ppEnd = pBod->GetNextPointer();
+		SetTail(pBod);
+		SetHead(pBod);
 	}
+}
+
+void COrbitApp::DeleteBodies()
+{
+	CBody* pBod, * pBTemp;
+
+	pBod = GetHead();
+	while (pBod)
+	{
+		pBTemp = pBod->GetNext();
+		delete pBod;
+		pBod = pBTemp;
+	}
+	SetHead(0);
+	SetTail(0);
 }
 
 // COrbitApp message handlers
@@ -189,7 +212,8 @@ void COrbitApp::OnSetupCreatebody()
 {
 	CEditBody dlg;
 
-	dlg.SetBody(GetBody());
+	dlg.SetChildView(pView);
+	dlg.SetBody(GetHead());
 	dlg.DoModal();
 	pView->Invalidate();
 }

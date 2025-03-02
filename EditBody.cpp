@@ -30,6 +30,9 @@ void CEditBody::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_POSITION_X, m_Edit_Pos_X);
 	DDX_Control(pDX, IDC_EDIT_POSITION_Y, m_Edit_Pos_Y);
 	DDX_Control(pDX, IDC_STATIC_BODY_ID, m_Static_BodyId);
+	DDX_Control(pDX, IDC_EDIT_SETUP_RADIUS, m_EditRadius);
+	DDX_Control(pDX, IDC_EDITBODIES_CHECK_FOLLOW, m_Check_Follow);
+	DDX_Control(pDX, IDC_EDIT_BREAD_CRUMBS, m_Edit_Bread_Crumbs);
 }
 
 
@@ -38,6 +41,7 @@ BEGIN_MESSAGE_MAP(CEditBody, CDialog)
 	ON_BN_CLICKED(IDOK, &CEditBody::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_BUTTON_ADD_NEW__BODY, &CEditBody::OnClickedButtonAddNewBody)
 	ON_STN_CLICKED(IDC_STATIC_BODYCOLOR, &CEditBody::OnClickedStaticBodycolor)
+	ON_BN_CLICKED(IDC_EDITBODIES_CHECK_FOLLOW, &CEditBody::OnBnClickedEditbodiesCheckFollow)
 END_MESSAGE_MAP()
 
 
@@ -80,7 +84,7 @@ BOOL CEditBody::OnInitDialog()
 	else         //Create a new body
 	{
 		m_pBody = CreateDefault();
-		ADDBODY(m_pBody);
+		theApp.AddBody(m_pBody);
 	}
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
@@ -102,6 +106,11 @@ void CEditBody::FillInFields()
 	double x, y;
 	double angle;
 
+	//-----------------------------
+	//  Body Radius
+	//-----------------------------
+	csText.Format(_T("%d"), m_pBody->GetRadius());
+	m_EditRadius.SetWindowTextW(csText);
 	//-----------------------------
 	// update the edit fields
 	// from the body class
@@ -135,6 +144,18 @@ void CEditBody::FillInFields()
 	//-------------------------------------
 	csText.Format(_T("Body-%d"), m_pBody->GetID());
 	m_Static_BodyId.SetWindowTextW(csText);
+	//----------------------------------------
+	// Follow Flag
+	//----------------------------------------
+	if (m_pBody->GetFollowFlag())
+	{
+		m_Check_Follow.SetCheck(BST_CHECKED);
+	}
+	else
+	{
+		m_Check_Follow.SetCheck(BST_UNCHECKED);
+	}
+		
 }
 
 void CEditBody::UpdateBody()
@@ -142,6 +163,11 @@ void CEditBody::UpdateBody()
 	CString csText;
 	double x, y, angle, mag;
 
+	//------------------------------------------
+	// Radius
+	//------------------------------------------
+	m_EditRadius.GetWindowTextW(csText);
+	m_pBody->SetRadius(int(_wtof(csText)) );
 	//------------------------------------------
 	// Mass
 	//------------------------------------------
@@ -166,7 +192,14 @@ void CEditBody::UpdateBody()
 	x = mag * cos(angle);
 	y = mag * sin(angle);
 	m_pBody->SetVelociry(CVector(x,y));
-	m_pBody->Print();
+	//----------------------------------------
+	// Follow Body Flag
+	//----------------------------------------
+	if (m_Check_Follow.GetCheck() == BST_CHECKED)
+		m_pBody->SetFollowFlag(1);
+	else
+		m_pBody->SetFollowFlag(0);
+	//	m_pBody->Print(10);
 }
 
 void CEditBody::OnClickedButtonAddNewBody()
@@ -174,7 +207,7 @@ void CEditBody::OnClickedButtonAddNewBody()
 	CBody* pBody;
 
 	pBody = CreateDefault();
-	ADDBODY(pBody);
+	theApp.AddBody(pBody);
 	m_pBody = m_pBody->GetNext();
 	FillInFields();
 }
@@ -189,5 +222,29 @@ void CEditBody::OnClickedStaticBodycolor()
 	{
 		m_pBody->SetColor(Dlg.GetColor());
 		m_Static_Color.SetColor(Dlg.GetColor());
+
 	}
+}
+
+void CEditBody::OnBnClickedEditbodiesCheckFollow()
+{
+	UINT Checked = m_Check_Follow.GetCheck();
+	CBody* pBody = m_pHead;
+	if (Checked == BST_UNCHECKED)
+	{
+		m_Check_Follow.SetCheck(BST_CHECKED);
+		while (pBody)
+		{
+			pBody->SetFollowFlag(0);
+			pBody = pBody->GetNext();
+		}
+		m_pBody->SetFollowFlag(1);
+		pWin->SetFollowBody(this->m_pBody);
+	}
+	else
+	{
+		m_Check_Follow.SetCheck(BST_UNCHECKED);
+		pWin->SetFollowBody(0);;
+	}
+
 }

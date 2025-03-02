@@ -15,9 +15,12 @@ class CEditBody : public CDialog
 	CEdit m_Edit_VelAngle;
 	CEdit m_Edit_Pos_X;
 	CEdit m_Edit_Pos_Y;
+	CButton m_Check_Follow;
+	CChildView* pWin;
 	DECLARE_DYNAMIC(CEditBody)
 
 public:
+	void SetChildView(CChildView* pW) { pWin = pW; }
 	CEditBody(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CEditBody();
 	afx_msg void OnClickedButtonNextbody();
@@ -41,4 +44,9 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	DECLARE_MESSAGE_MAP()
+public:
+	CEdit m_EditRadius;
+    afx_msg void OnBnClickedEditbodiesCheckFollow();
+	// Edith the bread crumbs
+	CEdit m_Edit_Bread_Crumbs;
 };

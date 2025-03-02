@@ -20,8 +20,9 @@ class COrbitApp : public CWinApp
 {
 	CChildView* pView;
 	CBody* m_pHead;
-	CBody** m_ppEnd;
+	CBody* m_pTail;
 	FILE* pConsol;
+	FILE* m_pLog;
 public:
 	COrbitApp() noexcept;
 	virtual BOOL InitInstance();
@@ -29,7 +30,12 @@ public:
 	afx_msg void OnAppAbout();
 	void SetView(CChildView* pV) { pView = pV; }
 	void AddBody(CBody* pBod);
-	CBody* GetBody() { return m_pHead; }
+	void DeleteBodies();
+	CBody* GetHead() { return m_pHead; }
+	void SetHead(CBody* pH) { m_pHead = pH; }
+	CBody* GetTail() { return m_pTail; }
+	void SetTail(CBody* pT) { m_pTail = pT; }
+	FILE* LogFile() { return m_pLog; }
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
@@ -37,6 +43,3 @@ public:
 };
 
 extern COrbitApp theApp;
-#define GETBODIES			(theApp.GetBody())
-#define GETNEXTBODY			(pBody)	(pBody->GetBody())
-#define ADDBODY(pBody)		(theApp.AddBody(pBody))
