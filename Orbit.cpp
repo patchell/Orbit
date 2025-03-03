@@ -210,10 +210,20 @@ void COrbitApp::OnAppAbout()
 
 void COrbitApp::OnSetupCreatebody()
 {
+	EditBodies(0);
+}
+
+void COrbitApp::EditBodies(CBody* pBody)
+{
 	CEditBody dlg;
 
 	dlg.SetChildView(pView);
-	dlg.SetBody(GetHead());
+	dlg.SetHeadBody(GetHead());
+	if (pBody)
+		dlg.SetBody(pBody);
+	else
+		dlg.SetBody(GetHead());
 	dlg.DoModal();
 	pView->Invalidate();
+
 }

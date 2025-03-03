@@ -6,10 +6,14 @@ context menu, Follow the body mode, etc.
 Some of this stuff is still not finished, for instance, the context menus don't actually 
 do anything.
 
-S.... Start
-P.....Pause
+E................Edit Bodies
+P................Pause/Run Toggle
+R................Rest to Beginning
+S............... Start
+Z + <SHIFT> .... Zoom IN
+Z................Zoom Out
 Mouse wheel ... Zoom in and out
-Mouse wheel + SHIFT.... Sample Rate
+Mouse wheel + <SHIFT>.... Speed Up/ Slow Down
 
 //-------------------------------
 Well, I would say most of the basic

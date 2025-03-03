@@ -1,6 +1,40 @@
 #include "pch.h"
+#include "Body.h"
 
 int CBody::IdCount = 0;
+
+void CBody::Create(
+	double Mass, 
+	CVector Velocity, 
+	CVector Position, 
+	COLORREF color, 
+	double Radius
+)
+{
+	m_InitialConditions.Create(
+		Mass,
+		Velocity,
+		Position,
+		color,
+		Radius
+	);
+	m_BodyState.Create(
+		Mass,
+		Velocity,
+		Position,
+		color,
+		Radius
+	);
+}
+
+void CBody::Reset()
+{
+	m_BodyState.m_Mass = m_InitialConditions.m_Mass;
+	m_BodyState.m_Velocity = m_InitialConditions.m_Velocity;
+	m_BodyState.m_Position = m_InitialConditions.m_Position;
+	m_BodyState.m_Color = m_InitialConditions.m_Color;
+	m_BodyState.m_Radius = m_InitialConditions.m_Radius;
+}
 
 void CBody::Draw(
 	CDC* pDC, 
@@ -105,6 +139,11 @@ void CBody::ResetBreadCrumbs()
 	m_LastBreadCrumb = 0;
 }
 
+void CBody::CopyAttributs(SAttributes* pDest, SAttributes* pSrc)
+{
+	pDest->Copy(pSrc);
+}
+
 void CBody::DrawBreadCrumbs(CDC* pDC, double Scale, CSize CenterOffset)
 {
 	int i, j;
@@ -113,7 +152,7 @@ void CBody::DrawBreadCrumbs(CDC* pDC, double Scale, CSize CenterOffset)
 	//	printf("Total Breadcrumbs %d  Index %d\n", m_numberOfBreadCrumbs,j);
 	for (i = 0; i < m_numberOfBreadCrumbs; ++i)
 	{
-		pDC->SetPixel(m_pBreadCrumbs[j++] + CenterOffset, m_Color);
+		pDC->SetPixel(m_pBreadCrumbs[j++] + CenterOffset, GetColor());
 		if (j == m_BreadCrumbsSize)j = 0;
 	}
 }
@@ -132,8 +171,8 @@ double CBody::KineticEnergy()
 	// KE = 1/2  m  V^2
 	//---------------------------
 	double KE;
-	double Speed = m_vVelocity.Mag();
-	KE = 0.5 * m_dMass * Speed * Speed;
+	double Speed = GetVelocity().Mag();
+	KE = 0.5 * GetMass() * Speed * Speed;
 	return KE;
 }
 
@@ -147,7 +186,7 @@ double CBody::PotentialEnergy(CBody* AttractingBody)
 
 	delta = GetPosition() - AttractingBody->GetPosition();
 	double r = delta.Mag();
-	PE = AttractingBody->GetMass() * m_dMass / r;
+	PE = AttractingBody->GetMass() * GetMass() / r;
 	return PE;
 }
 
@@ -164,9 +203,9 @@ void CBody::Print(int Indent)
 	printf("%sID:%d Pos X:%12.3lf Y:%12.3lf Speed:%12.3lf\n",
 		pI,
 		this->m_BodyID,
-		m_vPos.m_x,
-		m_vPos.m_y,
-		m_vVelocity.Mag()
+		GetPosition().m_x,
+		GetPosition().m_y,
+		GetVelocity().Mag()
 	);
 	delete[]pI;
 }

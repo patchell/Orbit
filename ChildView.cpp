@@ -20,6 +20,7 @@ CChildView::CChildView()
 	m_Shift = false;
 	m_pFollowThisBody = 0;
 	m_Speed = 10;
+	m_SpeedTiker = 0;
 }
 
 CChildView::~CChildView()
@@ -111,16 +112,15 @@ void CChildView::OnPaint()
 	++Count;
 	if (Count == 30)
 		Count = 0;
-	TheCenterOfGravity = CenterOfMass(theApp.GetHead());
-	DrawCircleAt(
-		&DCm,
-		TheCenterOfGravity.ToPoint(GetScale()) + m_CenterOffset,
-		5,
-		RGB(255, 0, 0)
-	);
+////	TheCenterOfGravity = CenterOfMass(theApp.GetHead());
+//	DrawCircleAt(
+//		&DCm,
+//		TheCenterOfGravity.ToPoint(GetScale()) + m_CenterOffset,
+//		5,
+//		RGB(255, 0, 0)
+//	);
 	if (m_Check)
 	{
-//		m_CenterOffset = m_CenterOffset + TheCenterOfGravity.ToPoint(GetScale());
 		m_CenterOffset.cx = (rectClient.Width() / 2) - TheCenterOfGravity.ToPoint(GetScale()).x;
 		m_CenterOffset.cy = (rectClient.Height() / 2) - TheCenterOfGravity.ToPoint(GetScale()).y;
 	}
@@ -147,7 +147,7 @@ void CChildView::CreateDefaultBodies()
 	CBody* pBody = 0;
 	int i = 0;
 
-	for (i = 0; i < 6; ++i)
+	for (i = 0; i < NUMBER_OF_BODIES; ++i)
 	{
 		pBody = new CBody;
 		theApp.AddBody(pBody);
@@ -160,12 +160,15 @@ void CChildView::SetDefaultBodyOrbits()
 	int i = 0;
 
 	pBody = theApp.GetHead();
-	for (i = 0; i < 6; ++i)
+	for (i = 0; i < NUMBER_OF_BODIES; ++i)
 	{
-		pBody->SetMass(GetBody( i)->m_Mass);
-		pBody->SetPosition(CVector(GetBody(i)->m_X, GetBody(i)->m_Y));
-		pBody->SetVelociry(CVector(GetBody(i)->m_VX, GetBody(i)->m_VY));
-		pBody->SetColor(GetBody(i)->m_Color);
+		pBody->Create(
+			GetBody(i)->m_Mass,
+			CVector(GetBody(i)->m_VX, GetBody(i)->m_VY),
+			CVector(GetBody(i)->m_X, GetBody(i)->m_Y),
+			GetBody(i)->m_Color,
+			GetBody(i)->m_Radius
+		);
 		pBody = pBody->GetNext();
 	}
 }
@@ -216,37 +219,46 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 	CVector dx;
 	if (m_Run)
 	{
-		pBodAttracted = theApp.GetHead();
-//		printf("tick %d\n", ++TimeCount);
-		while (pBodAttracted)
+		if (m_SpeedTiker <= 0)
+			m_SpeedTiker++;
+		if (m_SpeedTiker >= 0)
 		{
-			dx.Clear();
-			pBodAttracting = GetOtherBodies(pBodAttracted, 0);
-			while (pBodAttracting)
+			if (m_Speed >= 0)
+				m_SpeedTiker = m_Speed + 1;
+			do
 			{
-				dx = DeltaX(
-					pBodAttracted->GetPosition(),
-					pBodAttracting->GetPosition(),
-					pBodAttracting->GetMass()
-				) + dx;
-				pBodAttracting = GetOtherBodies(pBodAttracted, pBodAttracting);
-			}
-			CVector newPos;
-			CVector oldPos = pBodAttracted->GetPosition();
-			pBodAttracted->AddBreadCrum(oldPos.ToPoint(GetScale()));
-			newPos = oldPos + dx + pBodAttracted->GetVelocity();
-			pBodAttracted->SetTemps(newPos, pBodAttracted->GetVelocity() + dx);
-			//		printf("New Pos:(%d,%d) dX=(%lf,%lf)\n", int(newPos.m_x),int( newPos.m_y),dx.m_x,dx.m_y);
-			pBodAttracted = pBodAttracted = pBodAttracted->GetNext();
+				pBodAttracted = theApp.GetHead();
+				while (pBodAttracted)
+				{
+					dx.Clear();
+					pBodAttracting = GetOtherBodies(pBodAttracted, 0);
+					while (pBodAttracting)
+					{
+						dx = DeltaX(
+							pBodAttracted->GetPosition(),
+							pBodAttracting->GetPosition(),
+							pBodAttracting->GetMass()
+						) + dx;
+						pBodAttracting = GetOtherBodies(pBodAttracted, pBodAttracting);
+					}
+					CVector newPos;
+					CVector oldPos = pBodAttracted->GetPosition();
+					pBodAttracted->AddBreadCrum(oldPos.ToPoint(GetScale()));
+					newPos = oldPos + dx + pBodAttracted->GetVelocity();
+					pBodAttracted->SetTemps(newPos, pBodAttracted->GetVelocity() + dx);
+					pBodAttracted = pBodAttracted = pBodAttracted->GetNext();
+				}
+				pBodAttracted = theApp.GetHead();
+				while (pBodAttracted)
+				{
+					pBodAttracted->Update();
+					pBodAttracted = pBodAttracted->GetNext();
+				}
+				m_SpeedTiker--;
+			} while (m_SpeedTiker > 0);
+			Invalidate();
+			m_SpeedTiker = m_Speed;
 		}
-		//	printf("---------------------\n");
-		pBodAttracted = theApp.GetHead();
-		while (pBodAttracted)
-		{
-			pBodAttracted->Update();
-			pBodAttracted = pBodAttracted->GetNext();
-		}
-		Invalidate();
 	}
 	CWnd::OnTimer(nIDEvent);
 }
@@ -311,13 +323,57 @@ void CChildView::DrawCircleAt(CDC *pDC,CPoint ptCenter, int Radius, COLORREF col
 void CChildView::DrawAxis(CDC* pDC, CPoint ptCenter, CSize szScreenDimensions)
 {
 	CPen Pen, * oldPen;
+	CPen GreenPen;
+	int i = 1;
+	int x = 0, y = 0;
+	bool Loop = true;
 
-	Pen.CreatePen(PS_SOLID, 1, RGB(255, 128, 255));
+	pDC->SetBkColor(RGB(0, 0, 0));
+	Pen.CreatePen(PS_DOT, 1, RGB(64, 0, 0));
 	oldPen = pDC->SelectObject(&Pen);
 	pDC->MoveTo(0, ptCenter.y);;
 	pDC->LineTo(szScreenDimensions.cx, ptCenter.y);
 	pDC->MoveTo(ptCenter.x,0);;
 	pDC->LineTo(ptCenter.x, szScreenDimensions.cy);
+	// Draw Grid
+	GreenPen.CreatePen(PS_DOT, 1, RGB(0, 64, 0));
+	pDC->SelectObject(&GreenPen);
+	while (Loop)
+	{
+		y = ptCenter.y - 100 * i;
+		if (y > 0)
+		{
+			pDC->MoveTo(0, y);
+			pDC->LineTo(szScreenDimensions.cx, y);
+			y = ptCenter.y + 100 * i;
+			pDC->MoveTo(0, y);
+			pDC->LineTo(szScreenDimensions.cx, y);
+		}
+		else
+		{
+			Loop = false;
+		}
+		++i;
+	}
+	Loop = true;
+	i = 1;
+	while (Loop)
+	{
+		x = ptCenter.x - 100 * i;
+		if (x > 0)
+		{
+			pDC->MoveTo(x, szScreenDimensions.cy);
+			pDC->LineTo(x, 0);
+			x = ptCenter.x + 100 * i;
+			pDC->MoveTo(x, szScreenDimensions.cy);
+			pDC->LineTo(x, 0);
+			++i;
+		}
+		else
+		{
+			Loop = 0;
+		}
+	}
 	pDC->SelectObject(oldPen);
 }
 
@@ -387,6 +443,7 @@ CVector CChildView::CenterOfMass(CBody* pBodies)
 
 void CChildView::OnFileStart()
 {
+	OnFileReset();
 	m_Run = 1;
 }
 
@@ -420,14 +477,14 @@ void CChildView::OnFileReset()
 {
 	CBody* pBody = 0;
 
-	SetDefaultBodyOrbits();
-	Invalidate();
 	pBody = theApp.GetHead();
 	while (pBody)
 	{
+		pBody->CopyAttributs(pBody->GetBodyState(), pBody->GetInitialConditions());
 		pBody->ResetBreadCrumbs();
 		pBody = pBody->GetNext();
 	}
+	Invalidate();
 }
 
 
@@ -472,13 +529,18 @@ BOOL CChildView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	CBody* pBody = theApp.GetHead();
 	if (m_Shift)
 	{
-		m_Speed -= zDelta/50;
-		if (m_Speed < 10)
-			m_Speed = 10;
-		else if (m_Speed > 600)
-			m_Speed = 600;
-		m_TimerID = SetTimer(1000, m_Speed, 0);
-
+		if(zDelta < 0)
+		{
+			m_Speed -= 1;
+			if (m_Speed < -10)
+				m_Speed = -10;
+		}
+		else if (zDelta > 0)
+		{
+			m_Speed += 1;
+			if (m_Speed > 30)
+				m_Speed = 30;
+		}
 	}
 	else
 	{
@@ -549,9 +611,20 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	case VK_SHIFT:
 		m_Shift = true;
 		break;
+	case 'E':	//Edit Bodys
+	case 'e':
+		theApp.EditBodies(GetFollowBody());
+		break;
 	case 'P':
 	case 'p':
-		m_Run = 0;
+		if (m_Run)
+			m_Run = 0;
+		else
+			m_Run = 1;
+		break;
+	case 'R':
+	case 'r':
+		OnFileReset();
 		break;
 	case 'S':
 	case 's':
@@ -562,17 +635,35 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CChildView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
+	CBody* pBody = 0;
+	double ScaleFactor = 0.0;
+
 	switch (nChar)
 	{
 	case VK_SHIFT:
 		m_Shift = false;
 		break;
-	case 'P':
+	case 'P':	//Pause/Run Toggle
 	case 'p':
 		break;
-	case 'S':
+	case 'S':	//Start
 	case 's':
-		m_Run = 1;
+		OnFileStart();
+		break;
+	case 'z':	//ZOOM
+	case 'Z':
+		pBody = theApp.GetHead();
+		while (pBody)
+		{
+			pBody->ResetBreadCrumbs();
+			pBody = pBody->GetNext();
+		}
+		if (m_Shift)
+			ScaleFactor = 1.0 / 1.25;
+		else
+			ScaleFactor = 1.25;
+		SetScale(GetScale() * ScaleFactor);
+		Invalidate();
 		break;
 	}
 

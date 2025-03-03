@@ -40,6 +40,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnSetupCreatebody();
+	void EditBodies(CBody* pBody);
 };
 
 extern COrbitApp theApp;

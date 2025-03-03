@@ -5,6 +5,47 @@
 
 class CBody
 {
+	struct SAttributes {
+		double m_Mass;
+		CVector m_Velocity;
+		CVector m_Position;
+		COLORREF m_Color;
+		double m_Radius;
+		SAttributes() {
+			m_Mass = 1.0;
+			m_Velocity = CVector(0.0, 0.0);
+			m_Position = CVector(0.0, 0.0);;
+			m_Color = RGB(0,0,0);
+			m_Radius = 1.0;
+		}
+		void Create(
+			double Mass,
+			CVector Velocity,
+			CVector Position,
+			COLORREF color,
+			double Radius
+		)
+		{
+			m_Mass = Mass;
+			m_Velocity = Velocity;
+			m_Position = Position;;
+			m_Color = color;
+			m_Radius = Radius;
+		}
+		double GetMass() { return m_Mass; }
+		CVector GetVelocity() { return m_Velocity; }
+		CVector GetPosition() { return m_Position; }
+		COLORREF GetColer() { return m_Color; }
+		double GetRadius() { return m_Radius; }
+		void Copy(SAttributes* Src)
+		{
+			m_Mass = Src->m_Mass;
+			m_Velocity = Src->m_Velocity;
+			m_Position = Src->m_Position;;
+			m_Color = Src->m_Color;
+			m_Radius = Src->m_Radius;
+		}
+	};
 	CBody* m_pNext;
 	CBody* m_pPrev;
 	static int IdCount;
@@ -13,13 +54,10 @@ class CBody
 	//-------------------------
 	bool m_bFollow;
 	int m_BodyID;
-	CVector m_vPos;
-	CVector m_vVelocity;
+	SAttributes m_InitialConditions;
+	SAttributes m_BodyState;
 	CVector m_vPos_Temp;
 	CVector m_vVelocity_Temp;
-	COLORREF m_Color;
-	int m_Radius;
-	double m_dMass;
 	double m_PotentialEnergy;
 	double m_KineticEnergy;
 	CPoint m_pntScreen;
@@ -41,38 +79,50 @@ public:
 		m_Vel_Display = 0.0;
 		m_X_Display = 0.0;
 		m_Y_Display = 0.0;
-		m_vPos = CVector(0.0, 0.0);
-		m_vVelocity = CVector(0.0, 0.0);
 		m_pNext = 0;
 		m_pPrev = 0;
-		m_dMass = 1.0;
-		m_Color = RGB(255, 255, 0);
 		m_BreadCrumbsSize = NUMBER_OF_BREADCRUMBS;
 		m_pBreadCrumbs = new CPoint[m_BreadCrumbsSize];
 		m_numberOfBreadCrumbs = 0;
 		m_FirstBreadCrumb = 0;
 		m_LastBreadCrumb = 0;
-		m_Radius = 3;
 		m_BodyID = ++IdCount;
 		m_KineticEnergy = 0.0;
 		m_PotentialEnergy = 0.0;
 		m_pntScreen = CPoint(0, 0);
 	}
 	virtual ~CBody() {}
-	void Draw(CDC* pDC, double Scale, CSize CenterOffset);
+	void Create(
+		double Mass,
+		CVector Velocity,
+		CVector Position,
+		COLORREF color,
+		double Radius
+	);
+	SAttributes* GetInitialConditions() {
+		return &m_InitialConditions
+			;
+	}
+	SAttributes* GetBodyState() {
+		return &m_BodyState;
+	}
+	void Reset();
+		void Draw(CDC* pDC, double Scale, CSize CenterOffset);
 	void PrintStats(CDC* pDC, int x, int y, bool Update) ;
 	void PrintStats(FILE* pLog, const char* pS) ;
 	void SetVelociry(CVector v)
 	{
-		m_vVelocity = v;
+		m_BodyState.m_Velocity = v;
 	}
-	CVector GetVelocity() { return m_vVelocity; }
+	CVector GetVelocity() { return m_BodyState.m_Velocity; }
 	void SetPosition(CVector v) {
-		m_vPos = v;
+		m_BodyState.m_Position = v;
 	}
-	CVector GetPosition() { return m_vPos; }
-	void SetMass(double m) { m_dMass = m; }
-	double GetMass()  { return m_dMass; }
+	CVector GetPosition() { return m_BodyState.m_Position; }
+	void SetMass(double m) { 
+		m_BodyState.m_Mass = m;
+	}
+	double GetMass()  { return m_BodyState.m_Mass; }
 	CBody* GetNext() { return m_pNext; }
 	void SetNext(CBody* next) { m_pNext = next; }
 	CBody* GetPrev() { return m_pPrev; }
@@ -83,13 +133,13 @@ public:
 		m_vVelocity_Temp = v;
 	}
 	void Update() {
-		m_vPos = m_vPos_Temp;
-		m_vVelocity = m_vVelocity_Temp;
+		m_BodyState.m_Position = m_vPos_Temp;
+		m_BodyState.m_Velocity = m_vVelocity_Temp;
 	}
-	void SetColor(COLORREF c) { m_Color = c; }
-	COLORREF GetColor()  { return m_Color; }
-	void SetRadius(int r) { m_Radius = r; }
-	int GetRadius()  { return m_Radius; }
+	void SetColor(COLORREF c) { m_BodyState.m_Color = c; }
+	COLORREF GetColor()  { return m_BodyState.m_Color; }
+	void SetRadius(int r) { m_BodyState.m_Radius = r; }
+	int GetRadius()  { return m_BodyState.m_Radius; }
 	int GetID()  { return m_BodyID; }
 	double Distance(CBody* pB)   {
 		return GetPosition().Distance(pB->GetPosition());
@@ -101,6 +151,7 @@ public:
 	//--------------------------------------
 	void AddBreadCrum(CPoint p);
 	void ResetBreadCrumbs();
+	void CopyAttributs(SAttributes* pDest, SAttributes* pSrc);
 	void DrawBreadCrumbs(CDC* pDC, double Scale, CSize CenterOffset);
 	bool GetFollowFlag() { return m_bFollow; }
 	void SetFollowFlag(bool F) { m_bFollow = F; }

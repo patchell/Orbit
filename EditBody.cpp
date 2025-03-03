@@ -42,6 +42,7 @@ BEGIN_MESSAGE_MAP(CEditBody, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_ADD_NEW__BODY, &CEditBody::OnClickedButtonAddNewBody)
 	ON_STN_CLICKED(IDC_STATIC_BODYCOLOR, &CEditBody::OnClickedStaticBodycolor)
 	ON_BN_CLICKED(IDC_EDITBODIES_CHECK_FOLLOW, &CEditBody::OnBnClickedEditbodiesCheckFollow)
+	ON_EN_CHANGE(IDC_EDIT_VELOCITY_ANGLE, &CEditBody::OnChangeEditVelocityAngle)
 END_MESSAGE_MAP()
 
 
@@ -109,19 +110,18 @@ void CEditBody::FillInFields()
 	//-----------------------------
 	//  Body Radius
 	//-----------------------------
-	csText.Format(_T("%d"), m_pBody->GetRadius());
+	csText.Format(_T("%4.5lf"), m_pBody->GetInitialConditions()->GetRadius());
 	m_EditRadius.SetWindowTextW(csText);
 	//-----------------------------
 	// update the edit fields
-	// from the body class
 	//-----------------------------
-	csText.Format(_T("%lf"), m_pBody->GetMass());
+	csText.Format(_T("%lf"), m_pBody->GetInitialConditions()->GetMass());
 	m_Edit_Mass.SetWindowTextW(csText);
 	//-------------------------------------
 	// Velocity
 	//-------------------------------------
-	x = m_pBody->GetVelocity().m_x;
-	y = m_pBody->GetVelocity().m_y;
+	x = m_pBody->GetInitialConditions()->GetVelocity().m_x;
+	y = m_pBody->GetInitialConditions()->GetVelocity().m_y;
 	angle = atan2(y, x);
 	angle = 360 * angle / m_2Pi;
 	csText.Format(_T("%lf"), angle);
@@ -131,14 +131,14 @@ void CEditBody::FillInFields()
 	//-----------------------------------------
 	// Position
 	//----------------------------------------
-	csText.Format(_T("%lf"), m_pBody->GetPosition().m_x);
+	csText.Format(_T("%lf"), m_pBody->GetInitialConditions()->GetPosition().m_x);
 	m_Edit_Pos_X.SetWindowTextW(csText);
-	csText.Format(_T("%lf"), m_pBody->GetPosition().m_y);
+	csText.Format(_T("%lf"), m_pBody->GetInitialConditions()->GetPosition().m_y);
 	m_Edit_Pos_Y.SetWindowTextW(csText);
 	//--------------------------------------
 	// Body Color
 	//-------------------------------------
-	m_Static_Color.SetColor(m_pBody->GetColor());
+	m_Static_Color.SetColor(m_pBody->GetInitialConditions()->GetColer());
 	//-------------------------------------
 	// Body ID
 	//-------------------------------------
@@ -161,18 +161,21 @@ void CEditBody::FillInFields()
 void CEditBody::UpdateBody()
 {
 	CString csText;
-	double x, y, angle, mag;
+	double angle, mag, x, y;
+	CVector V, P;
+	double radius, mass;
+	COLORREF color;
 
 	//------------------------------------------
 	// Radius
 	//------------------------------------------
 	m_EditRadius.GetWindowTextW(csText);
-	m_pBody->SetRadius(int(_wtof(csText)) );
+	radius = _wtof(csText);
 	//------------------------------------------
 	// Mass
 	//------------------------------------------
 	m_Edit_Mass.GetWindowTextW(csText);
-	m_pBody->SetMass(_wtof(csText));
+	mass = _wtof(csText);
 	//------------------------------------------
 	// Position
 	//------------------------------------------
@@ -180,7 +183,7 @@ void CEditBody::UpdateBody()
 	x = _wtof(csText);
 	m_Edit_Pos_Y.GetWindowTextW(csText);
 	y = _wtof(csText);
-	m_pBody->SetPosition(CVector(x, y));
+	P = CVector(x, y);
 	//------------------------------------------
 	//  Velocity
 	//------------------------------------------
@@ -191,7 +194,7 @@ void CEditBody::UpdateBody()
 	angle = m_2Pi * angle / 360.0;
 	x = mag * cos(angle);
 	y = mag * sin(angle);
-	m_pBody->SetVelociry(CVector(x,y));
+	V = CVector(x,y);
 	//----------------------------------------
 	// Follow Body Flag
 	//----------------------------------------
@@ -200,6 +203,14 @@ void CEditBody::UpdateBody()
 	else
 		m_pBody->SetFollowFlag(0);
 	//	m_pBody->Print(10);
+	color = m_Static_Color.GetColor();
+	m_pBody->GetInitialConditions()->Create(
+		mass,
+		V,
+		P,
+		color,
+		radius
+	);
 }
 
 void CEditBody::OnClickedButtonAddNewBody()
@@ -247,4 +258,21 @@ void CEditBody::OnBnClickedEditbodiesCheckFollow()
 		pWin->SetFollowBody(0);;
 	}
 
+}
+
+void CEditBody::OnChangeEditVelocityAngle()
+{
+	double angle;
+	double mag;
+	double x, y;
+	CString csText;
+
+	m_Edit_VelMag.GetWindowTextW(csText);
+	mag = _wtof(csText);
+	m_Edit_VelAngle.GetWindowTextW(csText);
+	angle = _wtof(csText);
+	angle = m_2Pi * angle / 360.0;
+	x = mag * cos(angle);
+	y = mag * sin(angle);
+	printf("ANGLE = %5.2lf X = %8.2lf Y = %8.2lf\n", angle, x, y);
 }

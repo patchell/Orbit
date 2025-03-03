@@ -6,6 +6,7 @@
 #pragma once
 
 // CChildView window
+constexpr auto NUMBER_OF_BODIES = 8;
 
 class CChildView : public CWnd
 {
@@ -16,13 +17,15 @@ class CChildView : public CWnd
 		double m_VX;
 		double m_VY;
 		COLORREF m_Color;
+		double m_Radius;
 		BodyParams(
 			double m,
 			double x,
 			double y,
 			double vx,
 			double vy,
-			COLORREF color
+			COLORREF color,
+			double Radius
 		) {
 			m_Mass = m;
 			m_X = x;
@@ -30,16 +33,19 @@ class CChildView : public CWnd
 			m_VX = vx;
 			m_VY = vy;
 			m_Color = color;
+			m_Radius = Radius;
 
 		}
 	};
-	inline static BodyParams ParamsLUT[6] = {
-		{300.0,-150.0, 0.0, 0.0, 0.8, RGB(255, 0, 0)},
-		{500.0, 150.0, 0.0, 0.0, -0.4750, RGB(0, 0, 255)},
-		{2.0, 0.0, 600.0, -1.25, 0.0, RGB(0, 192, 0)},
-		{5.0, 0.0, -1200.0, -0.8, 0.0, RGB(128, 0, 192)},
-		{0.02, 0.0, -1208, -1.8, 0.0, RGB(128, 0, 192)},
-		{0.5, 4000.0,  -2000.0, -0.18, 0.1, RGB(0, 128, 192)}
+	inline static BodyParams ParamsLUT[8] = {
+		{300.0,-150.0, 0.0, 0.0, 0.8, RGB(255, 0, 0), 3.0},
+		{500.0, 150.0, 0.0, 0.0, -0.4750, RGB(0, 0, 255),4.0},
+		{2.0, 0.0, 600.0, -1.25, 0.0, RGB(0, 192, 0), 2},
+		{5.0, 0.0, -1200.0, -0.8, 0.0, RGB(128, 0, 192), 3},
+		{0.02, 0.0, -1208, -1.8, 0.0, RGB(128, 0, 192), 2},
+		{0.5, 5200.0,  200.0, 0.005, 0.1, RGB(0, 128, 192), 2},
+		{ 50.5, 2000,  2000, -0.35, 0.35, RGB(200, 40, 125), 4 },
+		{ 50.5, -2000,  -2000, 0.35, -0.35, RGB(200, 40, 125), 4 }
 	};
 	UINT m_TimerID;
 	double m_G;		// gravitation constant
@@ -50,6 +56,7 @@ class CChildView : public CWnd
 	bool m_Shift;
 	CBody* m_pFollowThisBody;
 	int m_Speed;
+	int m_SpeedTiker;
 public:
 	CChildView();
 	virtual ~CChildView();

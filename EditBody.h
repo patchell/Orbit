@@ -17,6 +17,9 @@ class CEditBody : public CDialog
 	CEdit m_Edit_Pos_Y;
 	CButton m_Check_Follow;
 	CChildView* pWin;
+	CEdit m_EditRadius;
+	// Edith the bread crumbs
+	CEdit m_Edit_Bread_Crumbs;
 	DECLARE_DYNAMIC(CEditBody)
 
 public:
@@ -29,7 +32,9 @@ public:
 	CBody* CreateDefault();
 	void SetBody(CBody* pBod) {
 		m_pBody = pBod;
-		m_pHead = pBod;
+	}
+	void SetHeadBody(CBody* pHead) {
+		m_pHead = pHead;
 	}
 	void FillInFields();
 	void UpdateBody();
@@ -45,8 +50,6 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	DECLARE_MESSAGE_MAP()
 public:
-	CEdit m_EditRadius;
     afx_msg void OnBnClickedEditbodiesCheckFollow();
-	// Edith the bread crumbs
-	CEdit m_Edit_Bread_Crumbs;
+	afx_msg void OnChangeEditVelocityAngle();
 };
