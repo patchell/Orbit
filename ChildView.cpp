@@ -19,7 +19,7 @@ CChildView::CChildView()
 	m_Check = 0;
 	m_Shift = false;
 	m_pFollowThisBody = 0;
-	m_Speed = 10;
+	m_Speed = 0;
 	m_SpeedTiker = 0;
 }
 
