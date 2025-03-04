@@ -25,8 +25,6 @@ CChildView::CChildView()
 
 CChildView::~CChildView()
 {
-	KillTimer(m_TimerID);
-	// Delete Bodies
 }
 
 
@@ -47,6 +45,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_CONTEXTMENU()
 	ON_WM_KEYDOWN()
 	ON_WM_KEYUP()
+	ON_COMMAND(ID_APP_EXIT, &CChildView::OnAppExit)
 END_MESSAGE_MAP()
 
 
@@ -294,7 +293,6 @@ void CChildView::OnIntialUpdate()
 	m_CenterOffset.cy = ClientArea.Height() / 2;
 	CreateDefaultBodies();
 	SetDefaultBodyOrbits();
-	m_TimerID = SetTimer(1000, 10, 0);
 	theApp.SetView(this);
 	SetScale(3.0);
 }
@@ -329,14 +327,14 @@ void CChildView::DrawAxis(CDC* pDC, CPoint ptCenter, CSize szScreenDimensions)
 	bool Loop = true;
 
 	pDC->SetBkColor(RGB(0, 0, 0));
-	Pen.CreatePen(PS_DOT, 1, RGB(64, 0, 0));
+	Pen.CreatePen(PS_DOT, 1, RGB(96, 0, 0));
 	oldPen = pDC->SelectObject(&Pen);
-	pDC->MoveTo(0, ptCenter.y);;
+	pDC->MoveTo(0, ptCenter.y);
 	pDC->LineTo(szScreenDimensions.cx, ptCenter.y);
 	pDC->MoveTo(ptCenter.x,0);;
 	pDC->LineTo(ptCenter.x, szScreenDimensions.cy);
 	// Draw Grid
-	GreenPen.CreatePen(PS_DOT, 1, RGB(0, 64, 0));
+	GreenPen.CreatePen(PS_DOT, 1, RGB(0, 36, 0));
 	pDC->SelectObject(&GreenPen);
 	while (Loop)
 	{
@@ -435,22 +433,27 @@ CVector CChildView::CenterOfMass(CBody* pBodies)
 	}
 	Mx /= TotalMass;
 	My /= TotalMass;
-	fprintf(theApp.LogFile(), "Center Of Gravityh: x=%8.2lf  y=%8.2lf  TotalMass = %12.6lf\n\n", Mx, My, TotalMass);
+	if(theApp.LogFile()) fprintf(theApp.LogFile(), "Center Of Gravityh: x=%8.2lf  y=%8.2lf  TotalMass = %12.6lf\n\n", Mx, My, TotalMass);
 	CentOfMass = CVector(Mx, My);
 	delete[] pS;
 	return CentOfMass;
 }
 
 void CChildView::OnFileStart()
-{
-	OnFileReset();
-	m_Run = 1;
+{	
+	if (m_Run == 0)
+	{
+//		OnFileReset();
+		m_Run = 1;
+		m_TimerID = SetTimer(1, 10, 0);
+	}
 }
 
 
 void CChildView::OnFilePause()
 {
 	m_Run = 0;
+	KillTimer(m_TimerID);
 }
 
 
@@ -477,14 +480,17 @@ void CChildView::OnFileReset()
 {
 	CBody* pBody = 0;
 
-	pBody = theApp.GetHead();
-	while (pBody)
+	if (m_Run == 0)
 	{
-		pBody->CopyAttributs(pBody->GetBodyState(), pBody->GetInitialConditions());
-		pBody->ResetBreadCrumbs();
-		pBody = pBody->GetNext();
+		pBody = theApp.GetHead();
+		while (pBody)
+		{
+			pBody->CopyAttributs(pBody->GetBodyState(), pBody->GetInitialConditions());
+			pBody->ResetBreadCrumbs();
+			pBody = pBody->GetNext();
+		}
+		Invalidate();
 	}
-	Invalidate();
 }
 
 
@@ -618,9 +624,19 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	case 'P':
 	case 'p':
 		if (m_Run)
+		{
 			m_Run = 0;
+			KillTimer(m_TimerID);
+		}
 		else
-			m_Run = 1;
+		{
+			OnFileStart();
+		}
+			
+		break;
+	case 'Q':
+	case 'q':
+		PostQuitMessage(0);
 		break;
 	case 'R':
 	case 'r':
@@ -668,4 +684,11 @@ void CChildView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 
 	CWnd::OnKeyUp(nChar, nRepCnt, nFlags);
+}
+
+void CChildView::OnAppExit()
+{
+	if(m_Run)
+		KillTimer(m_TimerID);
+	PostQuitMessage(0);
 }

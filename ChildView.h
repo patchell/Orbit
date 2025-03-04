@@ -61,6 +61,16 @@ public:
 	CChildView();
 	virtual ~CChildView();
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	bool IsRunning() {
+		bool rV = false;
+		if (m_Run) rV = true;
+		return rV;
+	}
+	bool IsNotRunning() {
+		bool rV = true;
+		if (m_Run) rV = false;
+		return rV;
+	}
 	void OnIntialUpdate();
 	//----------------------------
 	// Orbit Stuff
@@ -105,5 +115,6 @@ public:
     afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnAppExit();
 };
 

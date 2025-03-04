@@ -105,15 +105,15 @@ BOOL COrbitApp::InitInstance()
 	// Open up a "DOS" window to print debug
 	// Information to.
 	//---------------------------------------
-	AllocConsole();
-	freopen_s(&pConsol, "CONOUT$", "w", stdout);
-	printf("Ready\n");
+//	AllocConsole();
+//	freopen_s(&pConsol, "CONOUT$", "w", stdout);
+	if (theApp.HasConsol())	printf("Ready\n");
 
 	//-------------------------------------------
 	// Create a Log File
 	//-------------------------------------------
-	fopen_s(&m_pLog, "Log.txt", "w");
-	// The one and only window has been initialized, so show and update it
+//	fopen_s(&m_pLog, "Log.txt", "w");
+		// The one and only window has been initialized, so show and update it
 	pFrame->ShowWindow(SW_SHOW);
 	pFrame->UpdateWindow();
 	return TRUE;
@@ -121,9 +121,12 @@ BOOL COrbitApp::InitInstance()
 
 int COrbitApp::ExitInstance()
 {
-//	fclose(pConsol);
-	fclose(m_pLog);
-	FreeConsole();
+	if (pConsol) 
+	{
+		fclose(pConsol);
+		FreeConsole();
+	}
+	if(m_pLog) fclose(m_pLog);
 	DeleteBodies();
 	AfxOleTerm(FALSE);
 
@@ -217,13 +220,16 @@ void COrbitApp::EditBodies(CBody* pBody)
 {
 	CEditBody dlg;
 
-	dlg.SetChildView(pView);
-	dlg.SetHeadBody(GetHead());
-	if (pBody)
-		dlg.SetBody(pBody);
-	else
-		dlg.SetBody(GetHead());
-	dlg.DoModal();
-	pView->Invalidate();
+	if (pView->IsNotRunning())
+	{
+		dlg.SetChildView(pView);
+		dlg.SetHeadBody(GetHead());
+		if (pBody)
+			dlg.SetBody(pBody);
+		else
+			dlg.SetBody(GetHead());
+		dlg.DoModal();
+		pView->Invalidate();
+	}
 
 }

@@ -41,6 +41,12 @@ protected:
 public:
 	afx_msg void OnSetupCreatebody();
 	void EditBodies(CBody* pBody);
+	bool HasConsol() {
+		bool rV = false;
+		if (pConsol)
+			rV = true;
+		return rV;
+	}
 };
 
 extern COrbitApp theApp;

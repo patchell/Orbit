@@ -83,7 +83,7 @@ void CBody::PrintStats(FILE* pLog, const char* pS)
 	double Vel;
 
 	Vel = GetVelocity().Mag();
-	fprintf(pLog, "ID::%d:%s:Mass=%8.2lf VEL=%8.4lf X=%10.4lf Y=%10.4lf\n",
+	if(pLog) fprintf(pLog, "ID::%d:%s:Mass=%8.2lf VEL=%8.4lf X=%10.4lf Y=%10.4lf\n",
 		GetID(),
 		pS,
 		GetMass(),
@@ -149,7 +149,7 @@ void CBody::DrawBreadCrumbs(CDC* pDC, double Scale, CSize CenterOffset)
 	int i, j;
 
 	j = m_FirstBreadCrumb;
-	//	printf("Total Breadcrumbs %d  Index %d\n", m_numberOfBreadCrumbs,j);
+	if (theApp.HasConsol())	printf("Total Breadcrumbs %d  Index %d\n", m_numberOfBreadCrumbs,j);
 	for (i = 0; i < m_numberOfBreadCrumbs; ++i)
 	{
 		pDC->SetPixel(m_pBreadCrumbs[j++] + CenterOffset, GetColor());
@@ -200,7 +200,7 @@ void CBody::Print(int Indent)
 		pI[i] = ' ';
 	pI[i] = 0;
 
-	printf("%sID:%d Pos X:%12.3lf Y:%12.3lf Speed:%12.3lf\n",
+	if (theApp.HasConsol()) printf("%sID:%d Pos X:%12.3lf Y:%12.3lf Speed:%12.3lf\n",
 		pI,
 		this->m_BodyID,
 		GetPosition().m_x,

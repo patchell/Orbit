@@ -14,6 +14,7 @@ CEditBody::CEditBody(CWnd* pParent /*=nullptr*/)
 	m_pBody = 0;
 	m_pHead = 0;
 	m_2Pi = atan(1) * 8;
+	pWin = 0;
 }
 
 CEditBody::~CEditBody()
@@ -51,7 +52,7 @@ END_MESSAGE_MAP()
 
 void CEditBody::OnClickedButtonNextbody()
 {
-//	printf("Next Body\n");
+	if(theApp.HasConsol()) printf("Next Body\n");
 	UpdateBody();
 	m_pBody = m_pBody->GetNext();
 	if (m_pBody)
@@ -274,5 +275,5 @@ void CEditBody::OnChangeEditVelocityAngle()
 	angle = m_2Pi * angle / 360.0;
 	x = mag * cos(angle);
 	y = mag * sin(angle);
-	printf("ANGLE = %5.2lf X = %8.2lf Y = %8.2lf\n", angle, x, y);
+	if(theApp.HasConsol()) printf("ANGLE = %5.2lf X = %8.2lf Y = %8.2lf\n", angle, x, y);
 }

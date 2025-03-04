@@ -27,5 +27,5 @@ double CVector::DistanceSQ(CVector Other)
 
 void CVector::Print(const char *s) 
 {
-    printf("%s:X=%lf  Y=%lf  Z=%lf\n", s, m_x, m_y, m_z);
+	if (theApp.HasConsol()) printf("%s:X=%lf  Y=%lf  Z=%lf\n", s, m_x, m_y, m_z);
 }
