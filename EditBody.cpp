@@ -95,7 +95,7 @@ BOOL CEditBody::OnInitDialog()
 CBody* CEditBody::CreateDefault()
 {
 	CBody* pBody;
-	pBody = new CBody();
+	pBody = new CBody;
 	pBody->SetMass(300.0);
 	pBody->SetPosition(CVector(500.0, 300.0));
 	pBody->SetVelociry(CVector(0.0, 0.8));

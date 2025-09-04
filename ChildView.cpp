@@ -141,6 +141,10 @@ void CChildView::OnPaint()
 	);
 }
 
+void CChildView::Cross(CDC* pDC)
+{
+}
+
 void CChildView::CreateDefaultBodies()
 {
 	CBody* pBody = 0;
@@ -318,7 +322,10 @@ void CChildView::DrawCircleAt(CDC *pDC,CPoint ptCenter, int Radius, COLORREF col
 	pDC->SelectObject(pOldBrush);
 }
 
-void CChildView::DrawAxis(CDC* pDC, CPoint ptCenter, CSize szScreenDimensions)
+void CChildView::DrawAxis(
+	CDC* pDC, 
+	CPoint ptCenter, 
+	CSize szScreenDimensions)
 {
 	CPen Pen, * oldPen;
 	CPen GreenPen;
@@ -372,6 +379,15 @@ void CChildView::DrawAxis(CDC* pDC, CPoint ptCenter, CSize szScreenDimensions)
 			Loop = 0;
 		}
 	}
+	// mark the origin
+	CPen penWhite;
+	penWhite.CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+	pDC->SelectObject(&penWhite);
+	pDC->MoveTo(ptCenter + CSize(-8, 0));
+	pDC->LineTo(ptCenter + CSize(8, 0));
+	pDC->MoveTo(ptCenter + CSize(0, -8));
+	pDC->LineTo(ptCenter + CSize(0, 8));
+
 	pDC->SelectObject(oldPen);
 }
 

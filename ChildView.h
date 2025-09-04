@@ -6,7 +6,7 @@
 #pragma once
 
 // CChildView window
-constexpr auto NUMBER_OF_BODIES = 8;
+constexpr auto NUMBER_OF_BODIES = 5;
 
 class CChildView : public CWnd
 {
@@ -37,15 +37,15 @@ class CChildView : public CWnd
 
 		}
 	};
-	inline static BodyParams ParamsLUT[8] = {
-		{300.0,-150.0, 0.0, 0.0, 0.8, RGB(255, 0, 0), 3.0},
-		{500.0, 150.0, 0.0, 0.0, -0.4750, RGB(0, 0, 255),4.0},
-		{2.0, 0.0, 600.0, -1.25, 0.0, RGB(0, 192, 0), 2},
-		{5.0, 0.0, -1200.0, -0.8, 0.0, RGB(128, 0, 192), 3},
-		{0.02, 0.0, -1208, -1.8, 0.0, RGB(128, 0, 192), 2},
-		{0.5, 5200.0,  200.0, 0.005, 0.1, RGB(0, 128, 192), 2},
-		{ 50.5, 2000,  2000, -0.35, 0.35, RGB(200, 40, 125), 4 },
-		{ 50.5, -2000,  -2000, 0.35, -0.35, RGB(200, 40, 125), 4 }
+	inline static BodyParams ParamsLUT[NUMBER_OF_BODIES] = {
+		{600.0,-150.0, 0.0, 0.0, 1.5, RGB(255, 0, 0), 3.0},
+		{1000.0, 150.0, 0.0, 0.0, -0.90, RGB(0, 0, 255),4.0},
+//		{2.0, 0.0, 2000.0, -1.2, 0.0, RGB(0, 192, 0), 2},
+//		{5.0, 0.0, -1200.0, 0.82, 0.0, RGB(128, 0, 192), 3},
+//		{0.02, 0.0, -1208, 1.8, 0.0, RGB(128, 0, 192), 2},
+		{0.004, 20000.0,  1000.0, 0.006, 0.1, RGB(0, 128, 192), 2},
+		{ 5.5, 6000,  6000, -0.32, 0.32, RGB(200, 40, 255), 4 },
+		{ 10.5, -3000,  -3000, 0.43, -0.43, RGB(255, 255, 0), 4 }
 	};
 	UINT m_TimerID;
 	double m_G;		// gravitation constant
@@ -100,6 +100,7 @@ public:
 	// Message Handlers
 	//----------------------------
 	afx_msg void OnPaint();
+	void Cross(CDC* pDC);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnFileStart();

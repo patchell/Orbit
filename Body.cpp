@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Body.h"
 
-int CBody::IdCount = 0;
 
 void CBody::Create(
 	double Mass, 
@@ -34,6 +33,11 @@ void CBody::Reset()
 	m_BodyState.m_Position = m_InitialConditions.m_Position;
 	m_BodyState.m_Color = m_InitialConditions.m_Color;
 	m_BodyState.m_Radius = m_InitialConditions.m_Radius;
+	m_Vel_Display = 0.0;
+	m_X_Display = 0.0;
+	m_Y_Display = 0.0;
+	m_KineticEnergy = 0.0;
+	m_PotentialEnergy = 0.0;
 }
 
 void CBody::Draw(

@@ -1,7 +1,7 @@
 #pragma once
 
 
-#define NUMBER_OF_BREADCRUMBS	600
+#define NUMBER_OF_BREADCRUMBS	2000
 
 class CBody
 {
@@ -32,11 +32,11 @@ class CBody
 			m_Color = color;
 			m_Radius = Radius;
 		}
-		double GetMass() { return m_Mass; }
-		CVector GetVelocity() { return m_Velocity; }
-		CVector GetPosition() { return m_Position; }
-		COLORREF GetColer() { return m_Color; }
-		double GetRadius() { return m_Radius; }
+		double GetMass() const { return m_Mass; }
+		CVector GetVelocity() const { return m_Velocity; }
+		CVector GetPosition() const { return m_Position; }
+		COLORREF GetColer() const { return m_Color; }
+		double GetRadius() const { return m_Radius; }
 		void Copy(SAttributes* Src)
 		{
 			m_Mass = Src->m_Mass;
@@ -48,7 +48,7 @@ class CBody
 	};
 	CBody* m_pNext;
 	CBody* m_pPrev;
-	static int IdCount;
+	inline static int IdCount = 0;
 	//-------------------------
 	// Body Attributes
 	//-------------------------
