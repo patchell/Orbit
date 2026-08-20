@@ -105,8 +105,8 @@ BOOL COrbitApp::InitInstance()
 	// Open up a "DOS" window to print debug
 	// Information to.
 	//---------------------------------------
-//	AllocConsole();
-//	freopen_s(&pConsol, "CONOUT$", "w", stdout);
+	AllocConsole();
+	freopen_s(&pConsol, "CONOUT$", "w", stdout);
 	if (theApp.HasConsol())	printf("Ready\n");
 
 	//-------------------------------------------

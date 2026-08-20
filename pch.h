@@ -17,6 +17,8 @@
 #include "Vector.h"
 #include "Body.h"
 
+#include "DlgFollow.h"
+
 #include "StaticBitmap.h"
 #include "MainFrm.h"
 #include "Orbit.h"

@@ -20,7 +20,9 @@ CChildView::CChildView()
 	m_Shift = false;
 	m_pFollowThisBody = 0;
 	m_Speed = 0;
-	m_SpeedTiker = 0;
+	m_SpeedTicker = 0;
+	m_LButtonDown = false;
+	m_bLastMousePointValid = false;
 }
 
 CChildView::~CChildView()
@@ -46,6 +48,9 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_KEYDOWN()
 	ON_WM_KEYUP()
 	ON_COMMAND(ID_APP_EXIT, &CChildView::OnAppExit)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 
@@ -65,7 +70,17 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-void CChildView::OnPaint() 
+void CChildView::PickBodyToFollow()
+{
+	CDlgFollow Dlg;
+	UINT res = Dlg.DoModal();	
+	if (res == IDOK)
+	{
+		m_pFollowThisBody = Dlg.m_pFollowBody;
+	}
+}
+
+void CChildView::OnPaint()
 {
 	CDC DCm;
 	CBitmap bm;
@@ -118,17 +133,17 @@ void CChildView::OnPaint()
 //		5,
 //		RGB(255, 0, 0)
 //	);
-	if (m_Check)
-	{
-		m_CenterOffset.cx = (rectClient.Width() / 2) - TheCenterOfGravity.ToPoint(GetScale()).x;
-		m_CenterOffset.cy = (rectClient.Height() / 2) - TheCenterOfGravity.ToPoint(GetScale()).y;
-	}
-	else
-	{
-		m_CenterOffset.cx = rectClient.Width() / 2;
-		m_CenterOffset.cy = rectClient.Height() / 2;
+	//if (m_Check)
+	//{
+	//	m_CenterOffset.cx = (rectClient.Width() / 2) - TheCenterOfGravity.ToPoint(GetScale()).x;
+	//	m_CenterOffset.cy = (rectClient.Height() / 2) - TheCenterOfGravity.ToPoint(GetScale()).y;
+	//}
+	//else
+	//{
+	//	m_CenterOffset.cx = rectClient.Width() / 2;
+	//	m_CenterOffset.cy = rectClient.Height() / 2;
 
-	}
+	//}
 	dc.BitBlt(
 		rectClient.left, 
 		rectClient.top,
@@ -170,7 +185,8 @@ void CChildView::SetDefaultBodyOrbits()
 			CVector(GetBody(i)->m_VX, GetBody(i)->m_VY),
 			CVector(GetBody(i)->m_X, GetBody(i)->m_Y),
 			GetBody(i)->m_Color,
-			GetBody(i)->m_Radius
+			GetBody(i)->m_Radius,
+			GetBody(i)->m_pName
 		);
 		pBody = pBody->GetNext();
 	}
@@ -222,12 +238,12 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 	CVector dx;
 	if (m_Run)
 	{
-		if (m_SpeedTiker <= 0)
-			m_SpeedTiker++;
-		if (m_SpeedTiker >= 0)
+		if (m_SpeedTicker <= 0)
+			m_SpeedTicker++;
+		if (m_SpeedTicker >= 0)
 		{
 			if (m_Speed >= 0)
-				m_SpeedTiker = m_Speed + 1;
+				m_SpeedTicker = m_Speed + 1;
 			do
 			{
 				pBodAttracted = theApp.GetHead();
@@ -257,10 +273,10 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 					pBodAttracted->Update();
 					pBodAttracted = pBodAttracted->GetNext();
 				}
-				m_SpeedTiker--;
-			} while (m_SpeedTiker > 0);
+				m_SpeedTicker--;
+			} while (m_SpeedTicker > 0);
 			Invalidate();
-			m_SpeedTiker = m_Speed;
+			m_SpeedTicker = m_Speed;
 		}
 	}
 	CWnd::OnTimer(nIDEvent);
@@ -617,6 +633,7 @@ void CChildView::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 	switch (id)
 	{
 	case ID_CM_FOLLOW:
+		PickBodyToFollow();
 		break;
 	case ID_CM_BREADCRUMS:
 		break;
@@ -707,4 +724,38 @@ void CChildView::OnAppExit()
 	if(m_Run)
 		KillTimer(m_TimerID);
 	PostQuitMessage(0);
+}
+
+void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	m_LButtonDown = true;
+	CWnd::OnLButtonDown(nFlags, point);
+}
+
+void CChildView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	m_LButtonDown = false;
+	m_bLastMousePointValid = false;
+	CWnd::OnLButtonUp(nFlags, point);
+}
+
+void CChildView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	CSize delta;
+
+	if (m_bLastMousePointValid && m_LButtonDown)
+	{
+		delta = point - m_LastMousePoint;
+		m_CenterOffset += delta;
+		m_LastMousePoint = point;
+		printf("Cemter Offset: x=%d y=%d\n", m_CenterOffset.cx, m_CenterOffset.cy);
+		Invalidate();
+	}
+	else if(m_LButtonDown)
+	{
+		m_LastMousePoint = point;
+		m_bLastMousePointValid = true;
+	}
+
+	CWnd::OnMouseMove(nFlags, point);
 }

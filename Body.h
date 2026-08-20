@@ -11,19 +11,26 @@ class CBody
 		CVector m_Position;
 		COLORREF m_Color;
 		double m_Radius;
+		char* m_pName;
 		SAttributes() {
 			m_Mass = 1.0;
 			m_Velocity = CVector(0.0, 0.0);
 			m_Position = CVector(0.0, 0.0);;
 			m_Color = RGB(0,0,0);
 			m_Radius = 1.0;
+			m_pName = 0;
+		}
+		~SAttributes() {
+			if (m_pName)
+				delete[] m_pName;
 		}
 		void Create(
 			double Mass,
 			CVector Velocity,
 			CVector Position,
 			COLORREF color,
-			double Radius
+			double Radius,
+			const char* pName = 0
 		)
 		{
 			m_Mass = Mass;
@@ -31,12 +38,18 @@ class CBody
 			m_Position = Position;;
 			m_Color = color;
 			m_Radius = Radius;
+			if (pName)
+			{
+				m_pName = new char[strlen(pName) + 1];
+				strcpy_s(m_pName, strlen(pName) + 1, pName);
+			}
 		}
 		double GetMass() const { return m_Mass; }
 		CVector GetVelocity() const { return m_Velocity; }
 		CVector GetPosition() const { return m_Position; }
 		COLORREF GetColer() const { return m_Color; }
 		double GetRadius() const { return m_Radius; }
+		const char* GetName() const { return m_pName; }	
 		void Copy(SAttributes* Src)
 		{
 			m_Mass = Src->m_Mass;
@@ -44,6 +57,8 @@ class CBody
 			m_Position = Src->m_Position;;
 			m_Color = Src->m_Color;
 			m_Radius = Src->m_Radius;
+			m_pName = new char[strlen(Src->m_pName) + 1];
+			strcpy_s(m_pName, strlen(Src->m_pName) + 1, Src->m_pName);
 		}
 	};
 	CBody* m_pNext;
@@ -97,7 +112,8 @@ public:
 		CVector Velocity,
 		CVector Position,
 		COLORREF color,
-		double Radius
+		double Radius,
+		const char* pName = 0
 	);
 	SAttributes* GetInitialConditions() {
 		return &m_InitialConditions

@@ -44,6 +44,8 @@ BEGIN_MESSAGE_MAP(CEditBody, CDialog)
 	ON_STN_CLICKED(IDC_STATIC_BODYCOLOR, &CEditBody::OnClickedStaticBodycolor)
 	ON_BN_CLICKED(IDC_EDITBODIES_CHECK_FOLLOW, &CEditBody::OnBnClickedEditbodiesCheckFollow)
 	ON_EN_CHANGE(IDC_EDIT_VELOCITY_ANGLE, &CEditBody::OnChangeEditVelocityAngle)
+	ON_STN_CLICKED(IDC_STATIC_BODY_ID, &CEditBody::OnStnClickedStaticBodyId)
+	ON_STN_DBLCLK(IDC_STATIC_BODY_ID, &CEditBody::OnDblclkStaticBodyId)
 END_MESSAGE_MAP()
 
 
@@ -52,7 +54,7 @@ END_MESSAGE_MAP()
 
 void CEditBody::OnClickedButtonNextbody()
 {
-	if(theApp.HasConsol()) printf("Next Body\n");
+//	if(theApp.HasConsol()) printf("Next Body\n");
 	UpdateBody();
 	m_pBody = m_pBody->GetNext();
 	if (m_pBody)
@@ -275,5 +277,15 @@ void CEditBody::OnChangeEditVelocityAngle()
 	angle = m_2Pi * angle / 360.0;
 	x = mag * cos(angle);
 	y = mag * sin(angle);
-	if(theApp.HasConsol()) printf("ANGLE = %5.2lf X = %8.2lf Y = %8.2lf\n", angle, x, y);
+//	if(theApp.HasConsol()) printf("ANGLE = %5.2lf X = %8.2lf Y = %8.2lf\n", angle, x, y);
+}
+
+void CEditBody::OnStnClickedStaticBodyId()
+{
+	// TODO: Add your control notification handler code here
+}
+
+void CEditBody::OnDblclkStaticBodyId()
+{
+	// TODO: Add your control notification handler code here
 }

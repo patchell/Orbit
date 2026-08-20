@@ -56,6 +56,12 @@
     <ClInclude Include="StaticBitmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DlgFollow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgEditString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Orbit.cpp">
@@ -80,6 +86,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StaticBitmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgFollow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgEditString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

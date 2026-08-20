@@ -52,4 +52,6 @@ protected:
 public:
     afx_msg void OnBnClickedEditbodiesCheckFollow();
 	afx_msg void OnChangeEditVelocityAngle();
+    afx_msg void OnStnClickedStaticBodyId();
+    afx_msg void OnDblclkStaticBodyId();
 };
